@@ -1,0 +1,9 @@
+/data/
+/preview/
+/bottleneck_features_train.npy
+/first_try.h5
+/vgg16_weights.h5
+/bottleneck_features_train.npy
+/bottleneck_features_validation.npy
+/bottleneck_fc_model.h5
+/venv/
