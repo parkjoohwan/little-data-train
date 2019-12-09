@@ -6,4 +6,6 @@
 /bottleneck_features_train.npy
 /bottleneck_features_validation.npy
 /bottleneck_fc_model.h5
+:/venv/
+/data-uniform/
 /venv/

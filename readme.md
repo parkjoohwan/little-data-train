@@ -62,4 +62,4 @@ python classifier_from_little_data_using_pretraining_model
 ```
 # 참고자료
 - [https://keraskorea.github.io/posts/2018-10-24-little_data_powerful_model/](https://keraskorea.github.io/posts/2018-10-24-little_data_powerful_model/)
-- [classifier_from_little_data_using_pretraining_model](https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3)
+- [download vgg16_weights.h5](https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3)
