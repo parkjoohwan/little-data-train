@@ -3,17 +3,20 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense
 from tensorflow.keras import backend as K
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.optimizers import SGD
 
+import os, os.path
 
 # dimensions of our images.
 img_width, img_height = 150, 150
 
-train_data_dir = 'data/train'
-validation_data_dir = 'data/validation'
-nb_train_samples = 2000
-nb_validation_samples = 800
-epochs = 50
-batch_size = 16
+train_data_dir = 'data-uniform/train'
+validation_data_dir = 'data-uniform/validation'
+nb_train_samples = 400
+nb_validation_samples = 60
+epochs = 60
+batch_size = 10
 
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
@@ -23,29 +26,25 @@ else:
 # Convolution Layer 3개
 
 model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=input_shape))
-model.add(Activation('relu'))
+model.add(Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
+model.add(Conv2D(32, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.25))
 
-model.add(Conv2D(32, (3, 3)))
-model.add(Activation('relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.25))
 
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-# Sigmoid 활성화 Layer
-
-model.add(Flatten())    # 1차원 배열로 변환
-model.add(Dense(64))
-model.add(Activation('relu'))
+model.add(Flatten())
+model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(1))
-model.add(Activation('sigmoid'))
+model.add(Dense(2, activation='softmax'))
 
-model.compile(loss='binary_crossentropy',
-              optimizer='rmsprop',
+sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+model.compile(loss='categorical_crossentropy',
+              optimizer=sgd,
               metrics=['accuracy'])
 
 # 학습 이미지 전처리 argumentation
@@ -62,19 +61,31 @@ train_generator = train_datagen.flow_from_directory(
     train_data_dir,
     target_size=(img_width, img_height),
     batch_size=batch_size,
-    class_mode='binary')
+    class_mode='categorical')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
     target_size=(img_width, img_height),
     batch_size=batch_size,
-    class_mode='binary')
+    class_mode='categorical')
+
+checkpoint = ModelCheckpoint(filepath='weight', monitor='val_loss', verbose=1, save_best_only=True)
+early_stopping = EarlyStopping(monitor='val_loss', patience=6)
+
 
 model.fit_generator(
     train_generator,
     steps_per_epoch=nb_train_samples // batch_size,
     epochs=epochs,
     validation_data=validation_generator,
-    validation_steps=nb_validation_samples // batch_size)
+    validation_steps=nb_validation_samples // batch_size,
+    callbacks=[checkpoint,early_stopping]
+)
 
-model.save_weights('first_try.h5')
+
+
+model_json = model.to_json()
+with open("test_uniform_model.json", "w") as json_file:
+    json_file.write(model_json)
+
+model.save_weights('test_uniform_model.h5')
