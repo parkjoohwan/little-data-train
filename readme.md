@@ -60,6 +60,27 @@ python classifier_from_little_data_using_pretraining_model
 병목 특징을 이용한 bottleneck_features_train.npy, bottleneck_features_validation.npy 생성
 이후 vgg-16 학습 데이터의 fully-connected 모델 학습 후 저장
 ```
+
 # 참고자료
 - [https://keraskorea.github.io/posts/2018-10-24-little_data_powerful_model/](https://keraskorea.github.io/posts/2018-10-24-little_data_powerful_model/)
 - [download vgg16_weights.h5](https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3)
+
+# 야구 유니폼 분류 테스트
+
+```
+python test_classifier_uniform.py 
+python test_convert_model.py
+python test_model.py
+```
+1. test_classifier_uniform.py
+
+- training 후 학습된 가중치(weight), layer 구조를 각각 test_uniform_model.h5, test_uniform_model.json으로 저장
+
+2. test_convert_model.py
+
+- 1에서 만들어진 가중치와 json 파일을 이용해 model로 저장함
+
+3. test_model.py
+
+- 2에서 저장한 모델로 예측 테스트
+

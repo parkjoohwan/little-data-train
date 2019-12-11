@@ -4,7 +4,6 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense
 from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from tensorflow.keras.optimizers import SGD
 
 import os, os.path
 
@@ -26,25 +25,27 @@ else:
 # Convolution Layer 3개
 
 model = Sequential()
-model.add(Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
-model.add(Conv2D(32, (3, 3), activation='relu'))
+model.add(Conv2D(32, (3, 3), input_shape=input_shape))
+model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
 
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(Conv2D(32, (3, 3)))
+model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
+
+model.add(Conv2D(64, (3, 3)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Sigmoid 활성화 Layer
 
 model.add(Flatten())
 model.add(Dense(256, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(2, activation='softmax'))
 
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-
 model.compile(loss='categorical_crossentropy',
-              optimizer=sgd,
+              optimizer='adam',
               metrics=['accuracy'])
 
 # 학습 이미지 전처리 argumentation
@@ -70,7 +71,7 @@ validation_generator = test_datagen.flow_from_directory(
     class_mode='categorical')
 
 checkpoint = ModelCheckpoint(filepath='weight', monitor='val_loss', verbose=1, save_best_only=True)
-early_stopping = EarlyStopping(monitor='val_loss', patience=6)
+# early_stopping = EarlyStopping(monitor='val_loss', patience=6)
 
 
 model.fit_generator(
@@ -79,7 +80,7 @@ model.fit_generator(
     epochs=epochs,
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size,
-    callbacks=[checkpoint,early_stopping]
+    callbacks=[checkpoint]
 )
 
 
