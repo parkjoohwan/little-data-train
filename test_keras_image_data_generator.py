@@ -11,7 +11,7 @@ datagen = ImageDataGenerator(
         horizontal_flip=True,
         fill_mode='nearest')
 
-image_relevant_path='data/train/cats/cat.0.jpg'
+image_relevant_path='data-uniform/train/OB/images (54).jpg'
 
 if not os.path.exists(image_relevant_path):
     print('check image path : ' + image_relevant_path)
@@ -32,7 +32,7 @@ if not os.path.isdir(directory_name):
 i = 0
 for batch in datagen.flow(x, batch_size=1
                         , save_to_dir=directory_name
-                        , save_prefix='cat'
+                        , save_prefix='test'
                         , save_format='jpeg'):
     i += 1
     if i > 20:
